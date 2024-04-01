@@ -91,6 +91,10 @@ public class CSharpCodePreprocessor
             }
         }
 
+        // for some weird reason, ImGui writes defines for it's enums explicitly
+        // so we try to remove all reassignments, that assign enum to an int
+        _typeReassignments.RemoveAll(x => _enums.Any(y => y.Name == x.Type.GetPrimitiveType()) && x.AnotherType.GetPrimitiveType() == "int");
+
         foreach (var sConst in _enumConstants)
         {
             sConst.Modifiers.Add("public");
@@ -117,7 +121,7 @@ public class CSharpCodePreprocessor
                 var redefinedType = RecursiveTryGetTypeReassignment(sField.Type);
                 if (redefinedType is not null && redefinedType != sField.Type)
                 {
-                    sField.PrecedingComment ??= [..sField.PrecedingComment ?? [], $"Original type: {sField.Type.ToCSharpCode()}"];
+                    sField.ReturnComment = $"Original type: {sField.Type.ToCSharpCode()}";
                     sField.Type = redefinedType;
                 }
 
@@ -233,9 +237,9 @@ public class CSharpCodePreprocessor
             sFunc.Modifiers.Add("extern");
             
             var returnTypeRedefinedType = RecursiveTryGetTypeReassignment(sFunc.ReturnType);
-            if (returnTypeRedefinedType is not null && returnTypeRedefinedType != sFunc.ReturnType)
+            if (returnTypeRedefinedType is not null && returnTypeRedefinedType.ToCSharpCode() != sFunc.ReturnType.ToCSharpCode())
             {
-                sFunc.PrecedingComment = [..sFunc.PrecedingComment ?? [], $"ReturnType original type: {sFunc.ReturnType.ToCSharpCode()}"];
+                sFunc.ReturnComment = $"ReturnType original type: {sFunc.ReturnType.ToCSharpCode()}";
                 sFunc.ReturnType = returnTypeRedefinedType;
             }
             
@@ -249,9 +253,9 @@ public class CSharpCodePreprocessor
             foreach (var sArg in sFunc.Arguments)
             {
                 var redefinedType = RecursiveTryGetTypeReassignment(sArg.Type);
-                if (redefinedType is not null && redefinedType != sArg.Type)
+                if (redefinedType is not null && redefinedType.GetPrimitiveType() != sArg.Type.GetPrimitiveType())
                 {
-                    sFunc.PrecedingComment = [..sFunc.PrecedingComment ?? [], $"Param {sArg.Name} original type: {sArg.Type.ToCSharpCode()}"];
+                    sFunc.ParamComments.Add((sArg.Name, $"original type: {sArg.Type.ToCSharpCode()}"));
                     sArg.Type = redefinedType;
                 }
 

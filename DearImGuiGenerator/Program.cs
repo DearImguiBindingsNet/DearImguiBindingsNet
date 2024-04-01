@@ -386,6 +386,11 @@ CSharpType GetCSharpTypeOfDescription(TypeDescription typeDescription)
         {
             var type = typeDescription.BuiltinType!;
 
+            if (typeDescription.StorageClasses?.Count > 0 && typeDescription.StorageClasses[0] == "const")
+            {
+                return new CSharpPrimitiveType(cppToSharpKnownConversions.GetValueOrDefault(type, "unknown"), true);
+            }
+
             return new CSharpPrimitiveType(cppToSharpKnownConversions.GetValueOrDefault(type, "unknown"));
         }
         case "User":

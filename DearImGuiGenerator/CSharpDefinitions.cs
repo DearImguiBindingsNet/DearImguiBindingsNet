@@ -23,6 +23,8 @@ public abstract record CSharpDefinition(string Name, CSharpDefinitionKind Kind)
     // "// hello"
     // "{this_definition}"
     public string[]? PrecedingComment { get; set; }
+
+    public string? ReturnComment { get; set; }
 }
 
 public record CSharpEnum(string Name) : CSharpDefinition(Name, CSharpDefinitionKind.Enum)
@@ -74,7 +76,9 @@ public record CSharpFunction(string Name, CSharpType ReturnType) : CSharpDefinit
     public List<CSharpArgument> Arguments { get; private set; } = [];
 
     public CSharpType ReturnType { get; set; } = ReturnType;
-    
+
+    public List<(string ParamName, string Comment)> ParamComments { get; set; } = [];
+
     public override string ToString()
     {
         return $"{ReturnType} {Name}({string.Join(", ", Arguments)})";
@@ -84,6 +88,8 @@ public record CSharpFunction(string Name, CSharpType ReturnType) : CSharpDefinit
 public record CSharpDelegate(string Name, CSharpType ReturnType) : CSharpDefinition(Name, CSharpDefinitionKind.Delegate)
 {
     public List<CSharpArgument> Arguments { get; private set; } = [];
+
+    public List<(string ParamName, string Comment)> ParamComments { get; set; } = [];
     
     public override string ToString()
     {
@@ -142,7 +148,7 @@ public record CSharpTypeReassignment(CSharpType Type, CSharpType AnotherType) : 
 {
     public override string ToString()
     {
-        return $"{Name} = {AnotherType}";
+        return $"{Type} = {AnotherType}";
     }
 }
 
@@ -155,9 +161,11 @@ public abstract record CSharpType()
     public abstract bool IsPointer { get; }
 
     public abstract CSharpType InnerType { get; protected set; }
+
+    public abstract bool IsConst { get; init; }
 };
 
-public record CSharpPrimitiveType(string Type) : CSharpType()
+public record CSharpPrimitiveType(string Type, bool IsConst = false) : CSharpType()
 {
     public override string GetPrimitiveType()
     {
@@ -175,11 +183,16 @@ public record CSharpPrimitiveType(string Type) : CSharpType()
         get => throw new InvalidOperationException("No inner type on primitive");
         protected set => throw new InvalidOperationException("No inner type can be set to a primitive");
     }
+
+    public override string ToString()
+    {
+        return ToCSharpCode();
+    }
 }
 
-public record CSharpPointerType : CSharpType
+public record CSharpPointerType(CSharpType InnerType, bool IsConst = false) : CSharpType
 {
-    public override CSharpType InnerType { get; protected set; }
+    public override CSharpType InnerType { get; protected set; } = InnerType;
 
     public override string ToCSharpCode()
     {
@@ -188,14 +201,14 @@ public record CSharpPointerType : CSharpType
 
     public override bool IsPointer { get; } = true;
 
-    public CSharpPointerType(CSharpType innerType)
-    {
-        InnerType = innerType;
-    }
-
     public override string GetPrimitiveType()
     {
         return InnerType.GetPrimitiveType();
+    }
+
+    public override string ToString()
+    {
+        return ToCSharpCode();
     }
 }
 

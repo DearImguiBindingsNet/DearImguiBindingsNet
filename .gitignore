@@ -4,6 +4,6 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 
-generated
+#generated
 cimgui
 runtimes

@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "meta", "meta", "{2F6C1537-1
 		README.md = README.md
 		build_natives.sh = build_natives.sh
 		dear_bindings.Dockerfile = dear_bindings.Dockerfile
+		.gitignore = .gitignore
+		dear_bindings.dockerignore = dear_bindings.dockerignore
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DearImGuiBindings", "DearImGuiBindings\DearImGuiBindings.csproj", "{98AF6320-81CE-4605-A333-F5DEC6746D32}"

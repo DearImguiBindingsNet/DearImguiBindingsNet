@@ -72,7 +72,7 @@ public record TypeDescription(
     TypeDescription? ReturnType,
     TypeDescription? InnerType,
     List<TypeDescription>? Parameters,
-    List<string> StorageClasses
+    List<string>? StorageClasses
 );
 
 public record TypedefItem(
