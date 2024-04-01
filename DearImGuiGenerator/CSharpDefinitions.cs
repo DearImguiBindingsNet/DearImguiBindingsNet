@@ -35,24 +35,32 @@ public record CSharpEnum(string Name) : CSharpDefinition(Name, CSharpDefinitionK
     {
         return $"enum {Name}";
     }
+}
 
-    public void Write(CSharpCodeWriter writer)
-    {
-        writer.WriteLine($"enum {Name}");
-        writer.PushBlock();
-        foreach (var value in Values)
-        {
-            value.Write(writer);
-        }
-        writer.PopBlock();
-    }
+public record CSharpProperty(string Name, CSharpType Type, bool IsArray = false, string ArrayBound = "") : CSharpTypedVariable(
+    Name,
+    Type,
+    IsArray,
+    ArrayBound
+)
+{
+    public bool Get { get; set; }
+    public bool Set { get; set; }
+}
+
+public record CSharpConstructor(string ContainerName) : CSharpFunction(ContainerName, new CSharpPrimitiveType(ContainerName))
+{
 }
 
 public abstract record CSharpContainerType(string Name, CSharpDefinitionKind Kind) : CSharpDefinition(Name, Kind)
 {
+    public List<CSharpConstructor> Constructors { get; private set; } = [];
+    
     public List<CSharpTypedVariable> Fields { get; private set; } = [];
 
     public List<CSharpDefinition> InnerDeclarations { get; private set; } = [];
+
+    public List<CSharpProperty> Properties { get; private set; } = [];
 }
 
 public record CSharpStruct(string Name) : CSharpContainerType(Name, CSharpDefinitionKind.Struct)
@@ -78,6 +86,8 @@ public record CSharpFunction(string Name, CSharpType ReturnType) : CSharpDefinit
     public CSharpType ReturnType { get; set; } = ReturnType;
 
     public List<(string ParamName, string Comment)> ParamComments { get; set; } = [];
+
+    public List<string> Body { get; set; } = [];
 
     public override string ToString()
     {
@@ -223,5 +233,6 @@ public enum CSharpDefinitionKind
     Variable,
     NamedValue,
     TypeReassignment,
-    Delegate
+    Delegate,
+    Constructor
 }

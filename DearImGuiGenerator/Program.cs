@@ -92,7 +92,14 @@ var preprocessor = new CSharpCodePreprocessor(
 
 preprocessor.Preprocess();
 
-var codeWriter = new CSharpCodeWriter();
+var genNamespace = "ImGuiNative";
+var constantsClass = "ImGuiConsts";
+var functionsClass = "ImGuiNative";
+var outDir = "../DearImGuiBindings/generated";
+
+var codeWriter = new CSharpCodeWriter(genNamespace, constantsClass, functionsClass, outDir);
+
+codeWriter.UsingStatic = $"using static {constantsClass};";
 
 codeWriter.WriteConsts(constants.Concat(enumsConstants));
 
@@ -102,7 +109,7 @@ codeWriter.WriteEnums(enums);
 
 codeWriter.Flush();
 
-codeWriter.WriteStructs(structs);
+codeWriter.WriteStructs(structs, []);
 
 codeWriter.Flush();
 
@@ -117,6 +124,20 @@ codeWriter.Flush();
 codeWriter.WriteFunctions(functions);
 
 codeWriter.Flush();
+
+var managedGenerator = new CSharpManagedCodeGenerator(structs);
+
+var managedStructs = managedGenerator.GenerateStructs();
+
+var managedGenNamespace = "ImGui";
+var managedConstantsClass = "ImGui";
+var managedFunctionsClass = "ImGui";
+var managedOutDir = "../DearImGuiBindings/managed";
+
+var managedCodeWriter = new CSharpCodeWriter(managedGenNamespace, managedConstantsClass, managedFunctionsClass, managedOutDir);
+
+managedCodeWriter.WriteStructs(managedStructs, ["using ImGuiNative;"]);
+managedCodeWriter.Flush();
 
 void AttachComments(Comments? comments, CSharpDefinition definition)
 {

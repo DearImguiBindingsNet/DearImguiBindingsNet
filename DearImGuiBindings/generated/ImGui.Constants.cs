@@ -7,9 +7,9 @@ public static partial class ImGuiConsts
 
 	public const string IMGUI_DISABLE_OBSOLETE_KEYIO = "";
 
-	public const string IMGUI_VERSION = "1.90.5 WIP";
+	public const string IMGUI_VERSION = "1.90.4";
 
-	public const long IMGUI_VERSION_NUM = 19041;
+	public const long IMGUI_VERSION_NUM = 19040;
 
 	public const bool IMGUI_HAS_TABLE = true;
 

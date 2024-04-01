@@ -10,12 +10,6 @@ public class CSharpCodePreprocessor
     private readonly List<CSharpFunction> _functions;
     private readonly List<CSharpDelegate> _delegates;
 
-    private readonly List<CSharpConstant> _resultConstants = [];
-    private readonly List<CSharpDelegate> _resultDelegates = [];
-    private readonly List<CSharpEnum> _resultEnums = [];
-    private readonly List<CSharpStruct> _resultStructs = [];
-    private readonly List<CSharpFunction> _resultFunctions = [];
-
     private readonly List<CSharpTypeReassignment> _typeReassignments = [];
 
     public List<CSharpStruct> InlineArrays = [];
